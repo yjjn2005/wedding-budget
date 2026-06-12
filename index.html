@@ -608,7 +608,6 @@ function renderSec(sec){
     return '<tr>'+
       '<td style="color:var(--text-muted);font-size:11px;font-weight:700;">'+(idx+1)+'</td>'+
       '<td><input class="ei" value="'+eH(item.name)+'" data-s="'+sid+'" data-i="'+idx+'" data-f="name" onchange="uf(this)"></td>'+
-      '<td><input class="ei" style="font-size:12px;" value="'+eH(item.detail)+'" data-s="'+sid+'" data-i="'+idx+'" data-f="detail" onchange="uf(this)"></td>'+
       '<td class="r"><input class="ei-num" value="'+(item.actual>0?item.actual.toLocaleString('ko-KR'):'')+'" placeholder="0" data-s="'+sid+'" data-i="'+idx+'" data-f="actual" onchange="un(this)"></td>'+
       '<td><input class="ei" style="font-size:11px;" value="'+eH(item.note||'')+'" placeholder="비고" data-s="'+sid+'" data-i="'+idx+'" data-f="note" onchange="uf(this)"></td>'+
       '</tr>';
@@ -620,9 +619,9 @@ function renderSec(sec){
     '<div class="pt-item"><div class="pt-lbl">합계</div><div class="pt-val">'+W(t.actual)+'</div></div>'+
     '</div></div>'+
     '<div class="tbl-wrap"><table>'+
-    '<thead><tr><th style="width:30px">#</th><th>항목</th><th>세부내용</th><th class="r">금액</th><th>비고</th></tr></thead>'+
+    '<thead><tr><th style="width:30px">#</th><th>항목</th><th class="r">금액</th><th>비고</th></tr></thead>'+
     '<tbody>'+rows+'</tbody>'+
-    '<tfoot><tr><td colspan="3">✦ 소 계</td><td class="r">'+W(t.actual)+'</td><td></td></tr></tfoot>'+
+    '<tfoot><tr><td colspan="2">✦ 소 계</td><td class="r">'+W(t.actual)+'</td><td></td></tr></tfoot>'+
     '</table></div>'+
     '<button class="add-btn" onclick="addRow(&apos;'+sid+'&apos;)">＋ 항목 추가</button>'+
     '</div>';
