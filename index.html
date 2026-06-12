@@ -306,33 +306,11 @@ code{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);padding
 <div id="tab-summary" class="tab-content active">
   <div class="sum-grid">
     <div class="sum-card hl">
-      <div class="sc-label">총 예산</div>
-      <div class="sc-val" id="totalBudget">₩0</div>
-      <div class="sc-sub">전체 예상 비용</div>
-    </div>
-    <div class="sum-card">
-      <div class="sc-label">총 실제 비용</div>
+      <div class="sc-label">총 비용</div>
       <div class="sc-val" id="totalActual">₩0</div>
-      <div id="totalDiffBadge" class="badge badge-pend">예산 미설정</div>
-    </div>
-    <div class="sum-card">
-      <div class="sc-label">신랑 부담</div>
-      <div class="sc-val" id="groomTotal">₩0</div>
-    </div>
-    <div class="sum-card">
-      <div class="sc-label">신부 부담</div>
-      <div class="sc-val" id="brideTotal">₩0</div>
-    </div>
-    <div class="sum-card">
-      <div class="sc-label">공동 부담</div>
-      <div class="sc-val" id="jointTotal">₩0</div>
-    </div>
-    <div class="sum-card">
-      <div class="sc-label">미정/기타</div>
-      <div class="sc-val" id="tbdTotal">₩0</div>
+      <div class="sc-sub">전체 지출 합계</div>
     </div>
   </div>
-
   <!-- Gift Banner -->
   <div class="gift-banner" id="giftBanner" onclick="showTabById(&apos;gift&apos;)">
     <div class="gb-inner">
@@ -345,35 +323,22 @@ code{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);padding
     </div>
   </div>
 
-  <!-- Progress -->
-  <div class="card">
-    <div class="card-hdr"><div class="card-title">📈 카테고리별 예산 진행률</div></div>
-    <div class="card-body" id="progressRows"></div>
-  </div>
 
   <!-- Summary Table -->
   <div class="card">
-    <div class="card-hdr"><div class="card-title">📋 카테고리별 예산 현황</div></div>
+    <div class="card-hdr"><div class="card-title">📋 카테고리별 비용 현황</div></div>
     <div class="tbl-wrap">
       <table>
         <thead>
           <tr>
-            <th>#</th><th>카테고리</th>
-            <th class="r">예상</th><th class="r">실제</th><th class="r">차액</th>
-            <th class="r">신랑</th><th class="r">신부</th><th class="r">공동</th><th class="r">미정</th>
+            <th>#</th><th>카테고리</th><th class="r">비용</th>
           </tr>
         </thead>
         <tbody id="summaryBody"></tbody>
         <tfoot>
           <tr>
             <td colspan="2">✦ 합 계</td>
-            <td class="r" id="sumBudget">₩0</td>
             <td class="r" id="sumActual">₩0</td>
-            <td class="r" id="sumDiff">₩0</td>
-            <td class="r" id="sumGroom">₩0</td>
-            <td class="r" id="sumBride">₩0</td>
-            <td class="r" id="sumJoint">₩0</td>
-            <td class="r" id="sumTbd">₩0</td>
           </tr>
         </tfoot>
       </table>
@@ -629,16 +594,9 @@ function showTabById(id){
 // ════════════════════════════════════
 function calcSec(sid){
   var items=budgetData[sid]||[];
-  var b=0,a=0,gr=0,br=0,jt=0,td=0;
-  items.forEach(function(x){
-    b+=(x.budget||0);a+=(x.actual||0);
-    var v=x.actual||0;
-    if(x.payer==='신랑')gr+=v;
-    else if(x.payer==='신부')br+=v;
-    else if(x.payer==='공동')jt+=v;
-    else td+=v;
-  });
-  return{budget:b,actual:a,groom:gr,bride:br,joint:jt,tbd:td,diff:b-a};
+  var a=0;
+  items.forEach(function(x){a+=(x.actual||0);});
+  return{actual:a};
 }
 
 // ════════════════════════════════════
@@ -647,78 +605,44 @@ function calcSec(sid){
 function renderSec(sec){
   var sid=sec.id,items=budgetData[sid],t=calcSec(sid);
   var rows=items.map(function(item,idx){
-    var po=PAYERS.map(function(p){return '<option value="'+p+'"'+(item.payer===p?' selected':'')+'>'+p+'</option>';}).join('');
     return '<tr>'+
       '<td style="color:var(--text-muted);font-size:11px;font-weight:700;">'+(idx+1)+'</td>'+
       '<td><input class="ei" value="'+eH(item.name)+'" data-s="'+sid+'" data-i="'+idx+'" data-f="name" onchange="uf(this)"></td>'+
       '<td><input class="ei" style="font-size:12px;" value="'+eH(item.detail)+'" data-s="'+sid+'" data-i="'+idx+'" data-f="detail" onchange="uf(this)"></td>'+
-      '<td class="r"><input class="ei-num" value="'+(item.budget>0?item.budget.toLocaleString('ko-KR'):'')+'" placeholder="0" data-s="'+sid+'" data-i="'+idx+'" data-f="budget" onchange="un(this)"></td>'+
       '<td class="r"><input class="ei-num" value="'+(item.actual>0?item.actual.toLocaleString('ko-KR'):'')+'" placeholder="0" data-s="'+sid+'" data-i="'+idx+'" data-f="actual" onchange="un(this)"></td>'+
-      '<td class="r">'+WS((item.budget||0)-(item.actual||0))+'</td>'+
-      '<td style="min-width:70px"><select class="sel" data-s="'+sid+'" data-i="'+idx+'" data-f="payer" onchange="uf(this)">'+po+'</select></td>'+
       '<td><input class="ei" style="font-size:11px;" value="'+eH(item.note||'')+'" placeholder="비고" data-s="'+sid+'" data-i="'+idx+'" data-f="note" onchange="uf(this)"></td>'+
       '</tr>';
   }).join('');
-
   var h='<div class="card">'+
     '<div class="card-hdr">'+
     '<div class="card-title">'+sec.icon+' '+sec.label+'</div>'+
     '<div class="ptotals">'+
-    '<div class="pt-item"><div class="pt-lbl">예상</div><div class="pt-val">'+W(t.budget)+'</div></div>'+
-    '<div class="pt-item"><div class="pt-lbl">실제</div><div class="pt-val'+(t.actual>t.budget&&t.budget>0?' over':'')+'" >'+W(t.actual)+'</div></div>'+
+    '<div class="pt-item"><div class="pt-lbl">합계</div><div class="pt-val">'+W(t.actual)+'</div></div>'+
     '</div></div>'+
     '<div class="tbl-wrap"><table>'+
-    '<thead><tr><th style="width:30px">#</th><th>항목</th><th>세부내용</th><th class="r">예상</th><th class="r">실제</th><th class="r">차액</th><th>결제자</th><th>비고</th></tr></thead>'+
+    '<thead><tr><th style="width:30px">#</th><th>항목</th><th>세부내용</th><th class="r">금액</th><th>비고</th></tr></thead>'+
     '<tbody>'+rows+'</tbody>'+
-    '<tfoot><tr><td colspan="2">✦ 소 계</td><td></td><td class="r">'+W(t.budget)+'</td><td class="r">'+W(t.actual)+'</td><td class="r">'+WS(t.diff)+'</td><td colspan="2"></td></tr></tfoot>'+
+    '<tfoot><tr><td colspan="3">✦ 소 계</td><td class="r">'+W(t.actual)+'</td><td></td></tr></tfoot>'+
     '</table></div>'+
     '<button class="add-btn" onclick="addRow(&apos;'+sid+'&apos;)">＋ 항목 추가</button>'+
-    '<div class="pay-strip">'+
-    '<div class="pay-cell"><div class="pay-lbl">신랑</div><div class="pay-val">'+W(t.groom)+'</div></div>'+
-    '<div class="pay-cell"><div class="pay-lbl">신부</div><div class="pay-val">'+W(t.bride)+'</div></div>'+
-    '<div class="pay-cell"><div class="pay-lbl">공동</div><div class="pay-val">'+W(t.joint)+'</div></div>'+
-    '<div class="pay-cell"><div class="pay-lbl">미정/기타</div><div class="pay-val">'+W(t.tbd)+'</div></div>'+
-    '</div></div>';
+    '</div>';
   setH('tab-'+sid,h);
 }
 
 function renderSummary(){
-  var tB=0,tA=0,tGr=0,tBr=0,tJt=0,tTd=0;
-  var rows='',prog='';
+  var tA=0,rows='';
   SECTIONS.forEach(function(sec,i){
     var t=calcSec(sec.id);
-    tB+=t.budget;tA+=t.actual;tGr+=t.groom;tBr+=t.bride;tJt+=t.joint;tTd+=t.tbd;
-    var diff=t.budget-t.actual;
+    tA+=t.actual;
     rows+='<tr>'+
       '<td style="color:var(--text-muted);font-size:11px;">'+(i+1)+'</td>'+
       '<td style="font-weight:600">'+sec.icon+' '+sec.label+'</td>'+
-      '<td class="r">'+W(t.budget)+'</td><td class="r">'+W(t.actual)+'</td>'+
-      '<td class="r">'+WS(diff)+'</td>'+
-      '<td class="r">'+W(t.groom)+'</td><td class="r">'+W(t.bride)+'</td>'+
-      '<td class="r">'+W(t.joint)+'</td><td class="r">'+W(t.tbd)+'</td>'+
+      '<td class="r">'+W(t.actual)+'</td>'+
       '</tr>';
-    var pct=t.budget>0?Math.min(t.actual/t.budget*100,150):t.actual>0?100:0;
-    var over=t.actual>t.budget&&t.budget>0;
-    prog+='<div class="prog-row">'+
-      '<div class="prog-meta">'+
-      '<span class="prog-name">'+sec.icon+' '+sec.label+'</span>'+
-      '<span class="prog-nums">'+W(t.actual)+' / '+(t.budget>0?W(t.budget):'예산 미설정')+'</span>'+
-      '</div>'+
-      '<div class="prog-bg"><div class="prog-fill'+(over?' over':'')+'" style="width:'+pct+'%"></div></div>'+
-      '</div>';
   });
-  setT('totalBudget',W(tB));setT('totalActual',W(tA));
-  setT('groomTotal',W(tGr));setT('brideTotal',W(tBr));
-  setT('jointTotal',W(tJt));setT('tbdTotal',W(tTd));
-  var diff=tB-tA,badge=document.getElementById('totalDiffBadge');
-  if(badge){
-    if(tB===0){badge.className='badge badge-pend';badge.textContent='예산 미설정';}
-    else if(diff<0){badge.className='badge badge-over';badge.innerHTML='▲ 초과 '+W(-diff);}
-    else{badge.className='badge badge-ok';badge.innerHTML='▼ 여유 '+W(diff);}
-  }
-  setH('summaryBody',rows);setH('progressRows',prog);
-  setT('sumBudget',W(tB));setT('sumActual',W(tA));setH('sumDiff',WS(tB-tA));
-  setT('sumGroom',W(tGr));setT('sumBride',W(tBr));setT('sumJoint',W(tJt));setT('sumTbd',W(tTd));
+  setT('totalActual',W(tA));
+  setH('summaryBody',rows);
+  setT('sumActual',W(tA));
 }
 
 function renderAll(){
@@ -743,7 +667,7 @@ function un(el){
   renderSummary();
 }
 function addRow(sid){
-  budgetData[sid].push({name:'새 항목',detail:'',budget:0,actual:0,payer:'미정',note:''});
+  budgetData[sid].push({name:'새 항목',detail:'',budget:0,actual:0,payer:'공동',note:''});
   renderSec(SECTIONS.find(function(s){return s.id===sid;}));
   renderSummary();autoSave();
 }
@@ -1188,6 +1112,7 @@ function resetJeonse(){
 // BOOT
 // ════════════════════════════════════
 initData();
+Object.keys(budgetData).forEach(function(k){(budgetData[k]||[]).forEach(function(x){x.payer='공동';});});
 initGift();
 initJeonse();
 renderAll();
