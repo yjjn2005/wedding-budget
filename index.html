@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>💍 결혼 준비 예산 관리</title>
+<style>
+/* ── SYSTEM FONTS ONLY - no CDN ── */
+:root {
+  --gold:#C9A84C; --gold-light:#E8D5A3; --gold-dark:#9A7A2E;
+  --champagne:#F7F0E6; --ivory:#FDFAF5;
+  --charcoal:#1A1A2E; --dark:#16213E;
+  --text-primary:#1A1A2E; --text-secondary:#5A5A7A; --text-muted:#8A8AA8;
+  --white:#FFFFFF;
+  --success:#2E7D52; --success-bg:#E8F5EE;
+  --danger:#C0392B; --danger-bg:#FDECEA;
+  --warning:#D4890A; --warning-bg:#FEF3E2;
+  --border:rgba(201,168,76,0.2);
+  --shadow:0 2px 16px rgba(26,26,46,0.08);
+  --radius:14px; --radius-sm:9px;
+  /* system font stack - always available, no CDN needed */
+  --font-ui:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕","Noto Sans KR",sans-serif;
+  --font-num:"SF Pro Display","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:var(--font-ui);background:var(--ivory);color:var(--text-primary);-webkit-font-smoothing:antialiased;font-size:14px;}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,var(--charcoal),var(--dark));position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+.hdr-inner{max-width:1200px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.hdr-brand{display:flex;align-items:center;gap:10px;}
+.hdr-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 2px 10px rgba(201,168,76,.4);}
+.hdr-title{font-size:18px;font-weight:800;color:var(--gold-light);letter-spacing:.3px;}
+.hdr-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px;letter-spacing:.8px;text-transform:uppercase;}
+.sync-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.25);border-radius:18px;padding:5px 12px;cursor:pointer;color:var(--gold-light);font-size:11px;font-weight:600;font-family:var(--font-ui);}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#4CAF50;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── NAV ── */
+.nav-wrap{background:var(--dark);border-bottom:1px solid rgba(201,168,76,.15);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.nav-wrap::-webkit-scrollbar{display:none;}
+.nav-tabs{display:flex;max-width:1200px;margin:0 auto;padding:0 12px;min-width:max-content;}
+.nav-tab{padding:12px 16px;font-size:12px;font-weight:600;color:rgba(255,255,255,.4);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;user-select:none;}
+.nav-tab:hover{color:rgba(255,255,255,.75);}
+.nav-tab.active{color:var(--gold-light);border-bottom-color:var(--gold);}
+
+/* ── MAIN ── */
+.main{max-width:1200px;margin:0 auto;padding:22px 16px 80px;}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
+.card-hdr{background:linear-gradient(135deg,var(--charcoal),var(--dark));padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:16px;font-weight:800;color:var(--gold-light);display:flex;align-items:center;gap:8px;}
+.card-body{padding:20px;}
+
+/* ── SUMMARY GRID ── */
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:22px;}
+.sum-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow);}
+.sum-card.hl{background:linear-gradient(135deg,var(--charcoal),var(--dark));border-color:var(--gold-dark);}
+.sc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:7px;}
+.sum-card.hl .sc-label{color:rgba(232,213,163,.55);}
+.sc-val{font-size:26px;font-weight:900;font-family:var(--font-num);color:var(--text-primary);line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
+.sum-card.hl .sc-val{color:var(--gold-light);}
+.sc-sub{font-size:11px;color:var(--text-muted);margin-top:3px;}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;margin-top:5px;}
+.badge-over{background:var(--danger-bg);color:var(--danger);}
+.badge-ok{background:var(--success-bg);color:var(--success);}
+.badge-pend{background:var(--warning-bg);color:var(--warning);}
+
+/* ── PROGRESS ── */
+.prog-row{margin-bottom:12px;}
+.prog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.prog-name{font-size:12px;font-weight:600;color:var(--text-secondary);}
+.prog-nums{font-size:12px;font-weight:800;font-family:var(--font-num);color:var(--text-muted);font-variant-numeric:tabular-nums;}
+.prog-bg{height:5px;background:var(--champagne);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold-dark),var(--gold));transition:width .5s ease;}
+.prog-fill.over{background:linear-gradient(90deg,#C0392B,#E74C3C);}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{background:var(--champagne);padding:10px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+thead th.r{text-align:right;}
+tbody tr{border-bottom:1px solid rgba(201,168,76,.07);}
+tbody tr:hover{background:rgba(201,168,76,.04);}
+tbody td{padding:11px 12px;vertical-align:middle;}
+tbody td.r{text-align:right;font-family:var(--font-num);font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;}
+tfoot td{padding:12px;background:linear-gradient(135deg,rgba(26,26,46,.05),rgba(26,26,46,.02));border-top:2px solid var(--border);font-weight:800;font-family:var(--font-num);font-size:14px;font-variant-numeric:tabular-nums;}
+tfoot td.r{text-align:right;}
+
+/* ── EDITABLE ── */
+.ei{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.22);border-radius:6px;padding:5px 8px;font-size:13px;font-family:var(--font-ui);color:var(--text-primary);width:100%;transition:border-color .2s;}
+.ei:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+.ei-num{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.22);border-radius:6px;padding:5px 8px;font-size:13px;font-family:var(--font-num);font-weight:700;color:var(--text-primary);text-align:right;width:100%;font-variant-numeric:tabular-nums;transition:border-color .2s;-moz-appearance:textfield;}
+.ei-num::-webkit-outer-spin-button,.ei-num::-webkit-inner-spin-button{-webkit-appearance:none;}
+.ei-num:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+.sel{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:4px 6px;font-size:11px;font-family:var(--font-ui);color:var(--text-primary);cursor:pointer;width:100%;}
+.sel:focus{outline:none;border-color:var(--gold);}
+
+/* DIFF colors */
+.pos{color:var(--success);font-weight:800;}
+.neg{color:var(--danger);font-weight:800;}
+
+/* ── PAYER BADGES ── */
+.pb{display:inline-block;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.pb-gr{background:#EBF3FF;color:#1565C0;}
+.pb-br{background:#FCE4EC;color:#AD1457;}
+.pb-jt{background:#E8F5E9;color:#2E7D32;}
+.pb-td{background:#FFF8E1;color:#F57F17;}
+.pb-ot{background:#F3E5F5;color:#6A1B9A;}
+
+/* ── PAYER SUMMARY STRIP ── */
+.pay-strip{display:grid;grid-template-columns:repeat(4,1fr);background:var(--champagne);border-top:1px solid var(--border);}
+.pay-cell{padding:11px 14px;border-right:1px solid var(--border);text-align:center;}
+.pay-cell:last-child{border-right:none;}
+.pay-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:4px;}
+.pay-val{font-size:16px;font-weight:900;font-family:var(--font-num);color:var(--text-primary);font-variant-numeric:tabular-nums;}
+
+/* ── ADD ROW ── */
+.add-btn{display:flex;align-items:center;gap:7px;padding:9px 18px;margin:10px 14px;background:transparent;border:1px dashed rgba(201,168,76,.35);border-radius:7px;color:var(--gold-dark);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--font-ui);}
+.add-btn:hover{background:rgba(201,168,76,.07);border-color:var(--gold);}
+
+/* ── PANEL TOTALS ── */
+.ptotals{display:flex;gap:18px;align-items:center;}
+.pt-item{text-align:right;}
+.pt-lbl{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;}
+.pt-val{font-size:18px;font-weight:900;font-family:var(--font-num);color:var(--gold-light);font-variant-numeric:tabular-nums;}
+.pt-val.over{color:#ff7070;}
+
+/* ── SAVE BAR ── */
+.save-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(26,26,46,.97);backdrop-filter:blur(10px);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid rgba(201,168,76,.2);z-index:50;}
+.save-info{font-size:11px;color:rgba(255,255,255,.4);}
+.btns{display:flex;gap:8px;}
+.btn-pri{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:var(--charcoal);border:none;padding:10px 24px;border-radius:22px;font-size:12px;font-weight:800;font-family:var(--font-ui);cursor:pointer;box-shadow:0 2px 12px rgba(201,168,76,.35);transition:all .2s;}
+.btn-pri:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(201,168,76,.5);}
+.btn-sec{background:transparent;color:var(--gold-light);border:1px solid rgba(201,168,76,.3);padding:9px 18px;border-radius:22px;font-size:11px;font-weight:600;font-family:var(--font-ui);cursor:pointer;transition:all .2s;}
+.btn-sec:hover{background:rgba(201,168,76,.1);border-color:var(--gold);}
+
+/* ── TABS ── */
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ── GIFT ── */
+.gift-form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:18px;}
+.gf{display:flex;flex-direction:column;gap:5px;}
+.gf label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-muted);}
+.gf input,.gf select{background:var(--champagne);border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:9px 12px;font-size:13px;font-family:var(--font-ui);color:var(--text-primary);width:100%;transition:border-color .2s;}
+.gf input:focus,.gf select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+.gift-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-bottom:20px;}
+.gstat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:15px 16px;box-shadow:var(--shadow);}
+.gstat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-muted);margin-bottom:5px;}
+.gstat-val{font-size:22px;font-weight:900;font-family:var(--font-num);color:var(--text-primary);font-variant-numeric:tabular-nums;}
+.gstat-val.gold{color:var(--gold-dark);}
+.gstat-val.blue{color:#1565C0;}
+.gstat-val.pink{color:#AD1457;}
+.gstat-val.grn{color:var(--success);}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.fsearch{flex:1;min-width:140px;background:var(--white);border:1px solid var(--border);border-radius:20px;padding:8px 14px;font-size:12px;font-family:var(--font-ui);color:var(--text-primary);}
+.fsearch:focus{outline:none;border-color:var(--gold);}
+.fsel{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:8px 12px;font-size:11px;font-family:var(--font-ui);color:var(--text-secondary);cursor:pointer;}
+.fsel:focus{outline:none;border-color:var(--gold);}
+.gi-input{background:transparent;border:none;border-bottom:1px solid transparent;padding:2px 4px;font-size:12px;font-family:var(--font-ui);color:var(--text-primary);width:100%;min-width:55px;}
+.gi-input:focus{outline:none;border-bottom-color:var(--gold);background:rgba(201,168,76,.05);}
+.gi-input.num{text-align:right;font-family:var(--font-num);font-weight:700;font-variant-numeric:tabular-nums;}
+.gi-sel{background:transparent;border:1px solid transparent;padding:2px 4px;font-size:11px;font-family:var(--font-ui);color:var(--text-primary);cursor:pointer;border-radius:4px;width:100%;}
+.gi-sel:focus{outline:none;border-color:var(--gold);background:rgba(201,168,76,.05);}
+.del-btn{background:transparent;border:1px solid rgba(192,57,43,.3);color:var(--danger);padding:3px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:var(--font-ui);}
+.del-btn:hover{background:var(--danger-bg);}
+.drop-zone{border:2px dashed rgba(201,168,76,.35);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(201,168,76,.02);}
+.drop-zone:hover,.drop-zone.dv{border-color:var(--gold);background:rgba(201,168,76,.07);}
+.fmt-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.fmt-tbl th{background:rgba(201,168,76,.1);padding:6px 9px;border:1px solid rgba(201,168,76,.2);color:var(--gold-dark);font-weight:700;text-align:center;}
+.fmt-tbl td{padding:5px 9px;border:1px solid rgba(201,168,76,.15);color:var(--text-secondary);text-align:center;}
+.xl-btn{background:linear-gradient(135deg,#217346,#1a5c38);color:#fff;border:none;padding:9px 18px;border-radius:18px;font-size:11px;font-weight:700;font-family:var(--font-ui);cursor:pointer;transition:all .2s;box-shadow:0 2px 10px rgba(33,115,70,.3);}
+.xl-btn:hover{transform:translateY(-1px);}
+.tmpl-btn{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);color:var(--gold-dark);padding:8px 16px;border-radius:18px;font-size:11px;font-weight:700;font-family:var(--font-ui);cursor:pointer;transition:all .2s;}
+.tmpl-btn:hover{background:rgba(201,168,76,.15);}
+
+/* ── GIFT DASHBOARD BANNER ── */
+.gift-banner{display:none;background:linear-gradient(135deg,var(--charcoal),var(--dark));border:1px solid rgba(201,168,76,.3);border-radius:var(--radius);padding:18px 22px;margin-bottom:22px;cursor:pointer;}
+.gift-banner:hover{border-color:var(--gold);}
+.gb-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.gb-label{font-size:14px;font-weight:700;color:var(--gold-light);margin-bottom:3px;}
+.gb-sub{font-size:11px;color:rgba(255,255,255,.35);}
+.gb-nums{display:flex;gap:24px;flex-wrap:wrap;}
+.gb-item{text-align:right;}
+.gb-item-label{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+.gb-item-val{font-size:24px;font-weight:900;font-family:var(--font-num);color:var(--gold-light);font-variant-numeric:tabular-nums;}
+
+/* ── JEONSE ── */
+.jeonse-hero{background:linear-gradient(135deg,var(--charcoal),#1a2744,var(--dark));border:1px solid rgba(201,168,76,.25);border-radius:var(--radius);padding:24px 28px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;box-shadow:var(--shadow);}
+.jh-title{font-size:20px;font-weight:800;color:var(--gold-light);margin-bottom:5px;}
+.jh-sub{font-size:12px;color:rgba(255,255,255,.4);line-height:1.6;}
+.loan-pills{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px;}
+.lp{border:2px solid var(--border);border-radius:10px;padding:11px 8px;text-align:center;cursor:pointer;transition:all .2s;background:var(--white);}
+.lp:hover{border-color:var(--gold);background:rgba(201,168,76,.05);}
+.lp.sel{border-color:var(--gold);background:rgba(201,168,76,.1);}
+.lp-icon{font-size:18px;margin-bottom:3px;}
+.lp-name{font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:2px;}
+.lp-rate{font-size:11px;color:var(--gold-dark);font-family:var(--font-num);font-weight:800;}
+.ji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:20px;}
+.jf{display:flex;flex-direction:column;gap:5px;}
+.jf label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);}
+.jf .hint{font-size:10px;color:var(--text-muted);margin-top:2px;}
+.inp-wrap{position:relative;display:flex;align-items:center;}
+.inp-wrap .pfx{position:absolute;left:11px;font-size:13px;font-weight:800;color:var(--gold-dark);pointer-events:none;}
+.inp-wrap .sfx{position:absolute;right:11px;font-size:11px;font-weight:600;color:var(--text-muted);pointer-events:none;}
+.ji{width:100%;background:var(--champagne);border:1px solid rgba(201,168,76,.25);border-radius:9px;padding:10px 38px 10px 30px;font-size:15px;font-family:var(--font-num);font-weight:800;color:var(--text-primary);font-variant-numeric:tabular-nums;transition:border-color .2s;-moz-appearance:textfield;}
+.ji::-webkit-inner-spin-button,.ji::-webkit-outer-spin-button{-webkit-appearance:none;}
+.ji:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.12);background:#fffdf7;}
+.jsel{width:100%;background:var(--champagne);border:1px solid rgba(201,168,76,.25);border-radius:9px;padding:10px 12px;font-size:13px;font-family:var(--font-ui);font-weight:600;color:var(--text-primary);cursor:pointer;}
+.jsel:focus{outline:none;border-color:var(--gold);}
+.jrate-display{padding:10px 14px;background:var(--champagne);border:1px solid rgba(201,168,76,.25);border-radius:9px;font-family:var(--font-num);font-weight:800;font-size:15px;color:var(--gold-dark);}
+.btn-calc{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:var(--charcoal);border:none;padding:13px 36px;border-radius:26px;font-size:14px;font-weight:800;font-family:var(--font-ui);cursor:pointer;box-shadow:0 4px 16px rgba(201,168,76,.38);transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-calc:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(201,168,76,.55);}
+.btn-rst{background:transparent;color:var(--text-muted);border:1px solid var(--border);padding:12px 20px;border-radius:26px;font-size:12px;font-weight:600;font-family:var(--font-ui);cursor:pointer;transition:all .2s;}
+.btn-rst:hover{border-color:var(--gold);color:var(--gold-dark);}
+.j-result{display:none;animation:fadeUp .4s ease;}
+.j-result.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.jres-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:20px;}
+.jrc{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);}
+.jrc.acc{background:linear-gradient(135deg,var(--charcoal),var(--dark));border-color:var(--gold-dark);}
+.jrc.warn{background:linear-gradient(135deg,#7f1d1d,#991b1b);border-color:rgba(239,68,68,.4);}
+.jrc.good{background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(74,222,128,.3);}
+.jrc-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-muted);margin-bottom:7px;}
+.jrc.acc .jrc-lbl,.jrc.warn .jrc-lbl,.jrc.good .jrc-lbl{color:rgba(255,255,255,.45);}
+.jrc-val{font-size:22px;font-weight:900;font-family:var(--font-num);color:var(--text-primary);font-variant-numeric:tabular-nums;}
+.jrc.acc .jrc-val{color:var(--gold-light);}
+.jrc.warn .jrc-val{color:#fca5a5;}
+.jrc.good .jrc-val{color:#86efac;}
+.jrc-sub{font-size:11px;color:var(--text-muted);margin-top:4px;}
+.jrc.acc .jrc-sub,.jrc.warn .jrc-sub,.jrc.good .jrc-sub{color:rgba(255,255,255,.35);}
+.j-notice{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);border-radius:9px;padding:12px 16px;font-size:11px;color:var(--text-secondary);line-height:1.7;margin-top:8px;}
+.j-notice strong{color:var(--gold-dark);}
+
+/* ── DEPLOY ── */
+.deploy-card{background:linear-gradient(135deg,#0d1117,#161b22);border:1px solid rgba(201,168,76,.2);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;}
+.deploy-title{font-size:15px;font-weight:800;color:var(--gold-light);margin-bottom:6px;}
+.deploy-p{font-size:12px;color:rgba(255,255,255,.45);line-height:1.7;}
+.steps{margin-top:14px;display:flex;flex-direction:column;gap:9px;}
+.step{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:rgba(255,255,255,.5);}
+.sn{background:var(--gold-dark);color:var(--charcoal);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px;}
+code{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);padding:2px 6px;border-radius:4px;font-size:10px;color:var(--gold-light);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sum-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .gift-form-grid{grid-template-columns:1fr 1fr;}
+  .gift-stats{grid-template-columns:repeat(2,1fr);}
+  .loan-pills{grid-template-columns:repeat(3,1fr);}
+  .ji-grid{grid-template-columns:1fr 1fr;}
+  .jres-grid{grid-template-columns:repeat(2,1fr);}
+  .pay-strip{grid-template-columns:repeat(2,1fr);}
+  .pay-cell:nth-child(2){border-right:none;}
+  .pay-cell:nth-child(3){border-top:1px solid var(--border);}
+  .pay-cell:nth-child(4){border-top:1px solid var(--border);}
+  .ptotals{gap:10px;}
+  .pt-val{font-size:15px;}
+  .sc-val{font-size:22px;}
+  .gb-item-val{font-size:20px;}
+}
+@media(max-width:480px){
+  .loan-pills{grid-template-columns:repeat(2,1fr);}
+  .ji-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-brand">
+      <div class="hdr-icon">💍</div>
+      <div>
+        <div class="hdr-title">Wedding Budget</div>
+        <div class="hdr-sub">결혼 준비 예산 관리</div>
+      </div>
+    </div>
+    <div class="sync-btn">
+      <span class="sync-dot"></span>
+      <span id="syncLabel">자동 저장됨</span>
+    </div>
+  </div>
+  <div class="nav-wrap">
+    <div class="nav-tabs" id="navTabs">
+      <div class="nav-tab active" onclick="showTab('summary',this)">📊 총괄</div>
+      <div class="nav-tab" onclick="showTab('s1',this)">💌 상견례</div>
+      <div class="nav-tab" onclick="showTab('s2',this)">🏛️ 웨딩홀</div>
+      <div class="nav-tab" onclick="showTab('s3',this)">📸 스드메</div>
+      <div class="nav-tab" onclick="showTab('s4',this)">💎 예물예복</div>
+      <div class="nav-tab" onclick="showTab('s5',this)">🎊 부대비용</div>
+      <div class="nav-tab" onclick="showTab('s6',this)">✈️ 신혼여행</div>
+      <div class="nav-tab" onclick="showTab('s7',this)">🏠 신혼집혼수</div>
+      <div class="nav-tab" onclick="showTab('jeonse',this)">🏡 전세계산</div>
+      <div class="nav-tab" onclick="showTab('gift',this)">🎁 축의금</div>
+      <div class="nav-tab" onclick="showTab('deploy',this)">🚀 배포</div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+<!-- ══ SUMMARY TAB ══ -->
+<div id="tab-summary" class="tab-content active">
+  <div class="sum-grid">
+    <div class="sum-card hl">
+      <div class="sc-label">총 예산</div>
+      <div class="sc-val" id="totalBudget">₩0</div>
+      <div class="sc-sub">전체 예상 비용</div>
+    </div>
+    <div class="sum-card">
+      <div class="sc-label">총 실제 비용</div>
+      <div class="sc-val" id="totalActual">₩0</div>
+      <div id="totalDiffBadge" class="badge badge-pend">예산 미설정</div>
+    </div>
+    <div class="sum-card">
+      <div class="sc-label">신랑 부담</div>
+      <div class="sc-val" id="groomTotal">₩0</div>
+    </div>
+    <div class="sum-card">
+      <div class="sc-label">신부 부담</div>
+      <div class="sc-val" id="brideTotal">₩0</div>
+    </div>
+    <div class="sum-card">
+      <div class="sc-label">공동 부담</div>
+      <div class="sc-val" id="jointTotal">₩0</div>
+    </div>
+    <div class="sum-card">
+      <div class="sc-label">미정/기타</div>
+      <div class="sc-val" id="tbdTotal">₩0</div>
+    </div>
+  </div>
+
+  <!-- Gift Banner -->
+  <div class="gift-banner" id="giftBanner" onclick="showTabById(&apos;gift&apos;)">
+    <div class="gb-inner">
+      <div><div style="font-size:26px;margin-bottom:4px;">🎁</div><div class="gb-label">축의금 현황</div><div class="gb-sub">클릭하여 상세 내역 보기</div></div>
+      <div class="gb-nums">
+        <div class="gb-item"><div class="gb-item-label">총 축의금</div><div class="gb-item-val" id="dashGiftTotal">₩0</div></div>
+        <div class="gb-item"><div class="gb-item-label">하객 수</div><div class="gb-item-val" id="dashGiftCount">0명</div></div>
+        <div class="gb-item"><div class="gb-item-label">수지 차액</div><div class="gb-item-val" id="dashGiftNet" style="color:#4ade80;">₩0</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📈 카테고리별 예산 진행률</div></div>
+    <div class="card-body" id="progressRows"></div>
+  </div>
+
+  <!-- Summary Table -->
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📋 카테고리별 예산 현황</div></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>카테고리</th>
+            <th class="r">예상</th><th class="r">실제</th><th class="r">차액</th>
+            <th class="r">신랑</th><th class="r">신부</th><th class="r">공동</th><th class="r">미정</th>
+          </tr>
+        </thead>
+        <tbody id="summaryBody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">✦ 합 계</td>
+            <td class="r" id="sumBudget">₩0</td>
+            <td class="r" id="sumActual">₩0</td>
+            <td class="r" id="sumDiff">₩0</td>
+            <td class="r" id="sumGroom">₩0</td>
+            <td class="r" id="sumBride">₩0</td>
+            <td class="r" id="sumJoint">₩0</td>
+            <td class="r" id="sumTbd">₩0</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div><!-- end summary -->
+
+<!-- SECTION TABS (filled by JS) -->
+<div id="tab-s1" class="tab-content"></div>
+<div id="tab-s2" class="tab-content"></div>
+<div id="tab-s3" class="tab-content"></div>
+<div id="tab-s4" class="tab-content"></div>
+<div id="tab-s5" class="tab-content"></div>
+<div id="tab-s6" class="tab-content"></div>
+<div id="tab-s7" class="tab-content"></div>
+<div id="tab-jeonse" class="tab-content"></div>
+<div id="tab-gift" class="tab-content"></div>
+
+<!-- ══ DEPLOY TAB ══ -->
+<div id="tab-deploy" class="tab-content">
+  <div class="deploy-card">
+    <div class="deploy-title">🚀 GitHub Pages 배포 가이드</div>
+    <div class="deploy-p">이 파일 하나를 GitHub에 올리면 PC·모바일 어디서나 접속 가능한 앱이 됩니다.</div>
+    <div class="steps">
+      <div class="step"><span class="sn">1</span><span>github.com 접속 → <strong style="color:var(--gold-light)">New repository</strong> → 이름: <code>wedding-budget</code> → <strong style="color:var(--gold-light)">Public</strong> 선택 → Create</span></div>
+      <div class="step"><span class="sn">2</span><span>이 파일을 <code>index.html</code>로 저장 → <strong style="color:var(--gold-light)">Add file → Upload files</strong> → Commit changes</span></div>
+      <div class="step"><span class="sn">3</span><span>리포지토리 <strong style="color:var(--gold-light)">Settings → Pages → Branch: main → Save</strong> → 1~2분 후 자동 배포</span></div>
+      <div class="step"><span class="sn">4</span><span>접속 URL: <code>https://[유저명].github.io/wedding-budget</code></span></div>
+      <div class="step"><span class="sn">5</span><span>📱 모바일: Safari → 공유 → <strong style="color:var(--gold-light)">홈 화면에 추가</strong> 하면 앱처럼 사용 가능</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">💾 데이터 백업 / 복원</div></div>
+    <div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn-pri" onclick="exportData()">📥 JSON 내보내기</button>
+      <button class="btn-sec" onclick="document.getElementById(&apos;importFile&apos;).click()">📤 JSON 불러오기</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn-sec" style="border-color:rgba(192,57,43,.4);color:#E74C3C;" onclick="resetAll()">🗑️ 전체 초기화</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <div class="save-info" id="lastSaved">불러오는 중...</div>
+  <div class="btns">
+    <button class="btn-sec" onclick="exportData()">내보내기</button>
+    <button class="btn-pri" onclick="saveAll()">저장하기</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════
+// SECTION DATA
+// ════════════════════════════════════
+var SECTIONS = [
+  {id:'s1',label:'상견례 & 인사',icon:'💌',items:[
+    {name:'양가 첫인사 선물',detail:'X',budget:0,actual:0,payer:'미정',note:''},
+    {name:'상견례 식대',detail:'중국집(차이룸)',budget:0,actual:290000,payer:'신랑',note:''},
+    {name:'상견례 선물',detail:'떡',budget:0,actual:80000,payer:'신랑',note:''},
+    {name:'상견례 장소 이동비',detail:'X',budget:0,actual:0,payer:'미정',note:''},
+    {name:'기타',detail:'X',budget:0,actual:0,payer:'미정',note:''}
+  ]},
+  {id:'s2',label:'웨딩홀 & 본식',icon:'🏛️',items:[
+    {name:'대관료',detail:'예식장 대관',budget:0,actual:1550000,payer:'기타',note:'아빠'},
+    {name:'식대(보증인원)',detail:'1인 식대×보증인원',budget:0,actual:0,payer:'미정',note:''},
+    {name:'식대(추가인원)',detail:'당일 추가 하객',budget:0,actual:0,payer:'미정',note:''},
+    {name:'폐백',detail:'폐백실·음식·수모비',budget:0,actual:0,payer:'미정',note:''},
+    {name:'혼구용품',detail:'방명록·장갑·봉투',budget:0,actual:0,payer:'미정',note:''},
+    {name:'기타',detail:'직접 입력',budget:0,actual:0,payer:'미정',note:''}
+  ]},
+  {id:'s3',label:'스드메 & 촬영',icon:'📸',items:[
+    {name:'스튜디오',detail:'계약금·중도금·잔금',budget:0,actual:2600000,payer:'신랑',note:'예약금40:태현,잔금220:아빠'},
+    {name:'피팅비',detail:'드레스 투어 샵당',budget:0,actual:0,payer:'미정',note:''},
+    {name:'헬퍼 이모님',detail:'리허설·본식 각각',budget:0,actual:0,payer:'미정',note:''},
+    {name:'원본/수정본',detail:'원본·수정본 구매',budget:0,actual:0,payer:'미정',note:''},
+    {name:'드레스',detail:'프리미엄·블랙라벨',budget:0,actual:2030000,payer:'기타',note:'아빠'},
+    {name:'메이크업',detail:'얼리스타트·혼주추가',budget:0,actual:0,payer:'미정',note:''},
+    {name:'헤어 변형비',detail:'출장 헤어 변형',budget:0,actual:0,payer:'미정',note:''},
+    {name:'촬영 간식·소품',detail:'간식·부케·컨페티',budget:0,actual:144600,payer:'신랑',note:''},
+    {name:'대관령 입장료',detail:'직접 입력',budget:0,actual:108000,payer:'기타',note:'아빠'},
+    {name:'강릉 숙소비',detail:'직접 입력',budget:0,actual:369809,payer:'신랑',note:''}
+  ]},
+  {id:'s4',label:'예물 & 예복 & 예단',icon:'💎',items:[
+    {name:'웨딩밴드(반지)',detail:'브랜드·종로·청담',budget:0,actual:6250000,payer:'기타',note:'아빠'},
+    {name:'신랑 예복',detail:'정장·셔츠·수제화·타이',budget:0,actual:1785000,payer:'기타',note:'아빠'},
+    {name:'촬영용 정장 대여',detail:'스튜디오 촬영용',budget:0,actual:55000,payer:'기타',note:'아빠'},
+    {name:'신부 예물',detail:'다이아·목걸이·명품백',budget:0,actual:0,payer:'미정',note:''},
+    {name:'신랑 예물',detail:'명품 시계 등',budget:0,actual:0,payer:'미정',note:''},
+    {name:'혼주 한복',detail:'양가 어머니 한복',budget:0,actual:0,payer:'미정',note:''},
+    {name:'혼주 양복',detail:'양가 아버지 양복',budget:0,actual:0,payer:'미정',note:''},
+    {name:'예단/꾸밈비',detail:'현금예단·이불·은수저',budget:0,actual:0,payer:'미정',note:''},
+    {name:'기타',detail:'직접 입력',budget:0,actual:0,payer:'미정',note:''}
+  ]},
+  {id:'s5',label:'본식 부대비용',icon:'🎊',items:[
+    {name:'본식 스냅',detail:'메인·서브 작가·앨범',budget:700000,actual:0,payer:'미정',note:''},
+    {name:'본식 DVD',detail:'1인2캠·4K 옵션',budget:0,actual:0,payer:'미정',note:''},
+    {name:'아이폰 스냅',detail:'서브용 아이폰',budget:0,actual:0,payer:'미정',note:''},
+    {name:'청첩장 제작',detail:'봉투·식권·실링왁스',budget:0,actual:0,payer:'미정',note:''},
+    {name:'모바일 청첩장',detail:'종이 혜택 무료확인',budget:0,actual:0,payer:'미정',note:''},
+    {name:'청첩장 전달 식대',detail:'전달 식사 대접',budget:0,actual:0,payer:'미정',note:''},
+    {name:'부케 세트',detail:'부케·부토니에·코사지',budget:0,actual:0,payer:'미정',note:''},
+    {name:'사례비',detail:'사회자·축가·주례 등',budget:0,actual:0,payer:'미정',note:''},
+    {name:'웨딩카',detail:'렌트·지인 수고비',budget:0,actual:0,payer:'미정',note:''},
+    {name:'혼주 메이크업',detail:'양가 부모님·형제',budget:0,actual:0,payer:'미정',note:''},
+    {name:'하객 버스',detail:'지방 하객용 버스',budget:0,actual:0,payer:'미정',note:''},
+    {name:'기타',detail:'직접 입력',budget:0,actual:0,payer:'미정',note:''}
+  ]},
+  {id:'s6',label:'신혼여행',icon:'✈️',items:[
+    {name:'항공권',detail:'왕복(유류할증료포함)',budget:0,actual:3950000,payer:'미정',note:''},
+    {name:'숙박비',detail:'호텔·리조트·풀빌라',budget:0,actual:0,payer:'미정',note:''},
+    {name:'패키지·투어',detail:'스냅·액티비티·가이드',budget:0,actual:0,payer:'미정',note:''},
+    {name:'보험 & 비자',detail:'비자·여행자보험',budget:0,actual:0,payer:'미정',note:''},
+    {name:'환전 및 생활비',detail:'식비·팁·쇼핑·교통',budget:11300000,actual:0,payer:'미정',note:''},
+    {name:'답례품',detail:'양가·지인·직장동료',budget:0,actual:0,payer:'미정',note:''},
+    {name:'기타',detail:'직접 입력',budget:0,actual:0,payer:'미정',note:''}
+  ]},
+  {id:'s7',label:'신혼집 & 혼수',icon:'🏠',items:[
+    {name:'주거 보증금/매매금',detail:'전세·월세·매매',budget:0,actual:0,payer:'미정',note:''},
+    {name:'주거 부대비용',detail:'복비·취등록세',budget:0,actual:0,payer:'미정',note:''},
+    {name:'이사 및 인테리어',detail:'이사·청소·도배·인테리어',budget:0,actual:0,payer:'미정',note:''},
+    {name:'대형 가전',detail:'TV·냉장고·세탁기·에어컨',budget:0,actual:0,payer:'미정',note:''},
+    {name:'소형 가전',detail:'청소기·밥솥·공기청정기',budget:0,actual:0,payer:'미정',note:''},
+    {name:'가구',detail:'침대·소파·식탁·옷장',budget:0,actual:0,payer:'미정',note:''},
+    {name:'생활·주방 용품',detail:'그릇·냄비·침구',budget:0,actual:0,payer:'미정',note:''},
+    {name:'기타',detail:'직접 입력',budget:0,actual:0,payer:'미정',note:''}
+  ]}
+];
+
+var PAYERS = ['신랑','신부','공동','미정','기타'];
+var budgetData = {};
+var giftData = [];
+var giftFilter = {search:'',side:'',relation:''};
+var _gSeq = 1;
+
+// ════════════════════════════════════
+// UTILS
+// ════════════════════════════════════
+function W(n){
+  if(!n||n===0) return '₩0';
+  return '₩'+Math.abs(Math.round(n)).toLocaleString('ko-KR');
+}
+function WS(n){
+  var a=Math.abs(Math.round(n));
+  if(n===0) return '<span style="color:var(--text-muted)">₩0</span>';
+  if(n>0) return '<span class="pos">+₩'+a.toLocaleString('ko-KR')+'</span>';
+  return '<span class="neg">-₩'+a.toLocaleString('ko-KR')+'</span>';
+}
+function fmtMan(n){
+  if(Math.abs(n)>=100000000){
+    var e=Math.floor(n/100000000),m=Math.round((n%100000000)/10000);
+    return m>0?e+'억 '+m.toLocaleString('ko-KR')+'만원':e+'억원';
+  }
+  if(Math.abs(n)>=10000) return Math.round(n/10000).toLocaleString('ko-KR')+'만원';
+  return n.toLocaleString('ko-KR')+'원';
+}
+function eH(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function gid(){return 'g'+Date.now()+'_'+(++_gSeq);}
+function pad(n){return n<10?'0'+n:String(n);}
+function setT(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function setH(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v;}
+
+// ════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════
+function initData(){
+  var s=localStorage.getItem('wb_budget_v3');
+  if(s){try{budgetData=JSON.parse(s);SECTIONS.forEach(function(sec){if(!budgetData[sec.id])budgetData[sec.id]=sec.items.map(function(i){return Object.assign({},i);});});}catch(e){loadDefault();}}
+  else{loadDefault();}
+}
+function loadDefault(){
+  budgetData={};
+  SECTIONS.forEach(function(sec){budgetData[sec.id]=sec.items.map(function(i){return Object.assign({},i);});});
+}
+function initGift(){
+  var s=localStorage.getItem('wb_gift_v2');
+  if(s){try{giftData=JSON.parse(s);}catch(e){giftData=[];}}
+  var sq=localStorage.getItem('wb_gseq');
+  if(sq)_gSeq=parseInt(sq,10)||1;
+}
+function saveBudget(){
+  localStorage.setItem('wb_budget_v3',JSON.stringify(budgetData));
+  var now=new Date();
+  setT('lastSaved',pad(now.getHours())+':'+pad(now.getMinutes())+' 저장됨');
+  setSL('저장 완료 ✓');
+  setTimeout(function(){setSL('자동 저장됨');},2000);
+}
+function saveGift(){
+  localStorage.setItem('wb_gift_v2',JSON.stringify(giftData));
+  localStorage.setItem('wb_gseq',String(_gSeq));
+  renderGiftTab();
+  renderGiftBanner();
+}
+function saveAll(){saveBudget();renderAll();}
+function setSL(t){setT('syncLabel',t);}
+
+var _aST=null;
+function autoSave(){
+  clearTimeout(_aST);setSL('저장중...');
+  _aST=setTimeout(function(){localStorage.setItem('wb_budget_v3',JSON.stringify(budgetData));setSL('자동 저장됨 ✓');},800);
+}
+
+function exportData(){
+  var b=JSON.stringify({budget:budgetData,gift:giftData},null,2);
+  var a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(b);
+  a.download='wedding_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+function importData(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var p=JSON.parse(ev.target.result);
+      if(p.budget)budgetData=p.budget;
+      if(p.gift)giftData=p.gift;
+      saveBudget();saveGift();renderAll();alert('데이터를 불러왔습니다!');
+    }catch(err){alert('JSON 파일을 읽을 수 없습니다.');}
+  };
+  r.readAsText(f);e.target.value='';
+}
+function resetAll(){
+  if(!confirm('모든 데이터를 초기화하겠습니까?'))return;
+  loadDefault();giftData=[];saveBudget();saveGift();renderAll();
+}
+
+// ════════════════════════════════════
+// TAB NAV
+// ════════════════════════════════════
+function showTab(id,el){
+  document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active');});
+  var tab=document.getElementById('tab-'+id);
+  if(tab)tab.classList.add('active');
+  if(el)el.classList.add('active');
+  if(id==='gift')renderGiftTab();
+  if(id==='jeonse')renderJeonseTab();
+}
+function showTabById(id){
+  var ORDER=['summary','s1','s2','s3','s4','s5','s6','s7','jeonse','gift','deploy'];
+  var tabs=document.querySelectorAll('.nav-tab');
+  var i=ORDER.indexOf(id);
+  showTab(id,i>=0?tabs[i]:null);
+}
+
+// ════════════════════════════════════
+// BUDGET CALC
+// ════════════════════════════════════
+function calcSec(sid){
+  var items=budgetData[sid]||[];
+  var b=0,a=0,gr=0,br=0,jt=0,td=0;
+  items.forEach(function(x){
+    b+=(x.budget||0);a+=(x.actual||0);
+    var v=x.actual||0;
+    if(x.payer==='신랑')gr+=v;
+    else if(x.payer==='신부')br+=v;
+    else if(x.payer==='공동')jt+=v;
+    else td+=v;
+  });
+  return{budget:b,actual:a,groom:gr,bride:br,joint:jt,tbd:td,diff:b-a};
+}
+
+// ════════════════════════════════════
+// BUDGET RENDER
+// ════════════════════════════════════
+function renderSec(sec){
+  var sid=sec.id,items=budgetData[sid],t=calcSec(sid);
+  var rows=items.map(function(item,idx){
+    var po=PAYERS.map(function(p){return '<option value="'+p+'"'+(item.payer===p?' selected':'')+'>'+p+'</option>';}).join('');
+    return '<tr>'+
+      '<td style="color:var(--text-muted);font-size:11px;font-weight:700;">'+(idx+1)+'</td>'+
+      '<td><input class="ei" value="'+eH(item.name)+'" data-s="'+sid+'" data-i="'+idx+'" data-f="name" onchange="uf(this)"></td>'+
+      '<td><input class="ei" style="font-size:12px;" value="'+eH(item.detail)+'" data-s="'+sid+'" data-i="'+idx+'" data-f="detail" onchange="uf(this)"></td>'+
+      '<td class="r"><input class="ei-num" value="'+(item.budget>0?item.budget.toLocaleString('ko-KR'):'')+'" placeholder="0" data-s="'+sid+'" data-i="'+idx+'" data-f="budget" onchange="un(this)"></td>'+
+      '<td class="r"><input class="ei-num" value="'+(item.actual>0?item.actual.toLocaleString('ko-KR'):'')+'" placeholder="0" data-s="'+sid+'" data-i="'+idx+'" data-f="actual" onchange="un(this)"></td>'+
+      '<td class="r">'+WS((item.budget||0)-(item.actual||0))+'</td>'+
+      '<td style="min-width:70px"><select class="sel" data-s="'+sid+'" data-i="'+idx+'" data-f="payer" onchange="uf(this)">'+po+'</select></td>'+
+      '<td><input class="ei" style="font-size:11px;" value="'+eH(item.note||'')+'" placeholder="비고" data-s="'+sid+'" data-i="'+idx+'" data-f="note" onchange="uf(this)"></td>'+
+      '</tr>';
+  }).join('');
+
+  var h='<div class="card">'+
+    '<div class="card-hdr">'+
+    '<div class="card-title">'+sec.icon+' '+sec.label+'</div>'+
+    '<div class="ptotals">'+
+    '<div class="pt-item"><div class="pt-lbl">예상</div><div class="pt-val">'+W(t.budget)+'</div></div>'+
+    '<div class="pt-item"><div class="pt-lbl">실제</div><div class="pt-val'+(t.actual>t.budget&&t.budget>0?' over':'')+'" >'+W(t.actual)+'</div></div>'+
+    '</div></div>'+
+    '<div class="tbl-wrap"><table>'+
+    '<thead><tr><th style="width:30px">#</th><th>항목</th><th>세부내용</th><th class="r">예상</th><th class="r">실제</th><th class="r">차액</th><th>결제자</th><th>비고</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody>'+
+    '<tfoot><tr><td colspan="2">✦ 소 계</td><td></td><td class="r">'+W(t.budget)+'</td><td class="r">'+W(t.actual)+'</td><td class="r">'+WS(t.diff)+'</td><td colspan="2"></td></tr></tfoot>'+
+    '</table></div>'+
+    '<button class="add-btn" onclick="addRow(&apos;'+sid+'&apos;)">＋ 항목 추가</button>'+
+    '<div class="pay-strip">'+
+    '<div class="pay-cell"><div class="pay-lbl">신랑</div><div class="pay-val">'+W(t.groom)+'</div></div>'+
+    '<div class="pay-cell"><div class="pay-lbl">신부</div><div class="pay-val">'+W(t.bride)+'</div></div>'+
+    '<div class="pay-cell"><div class="pay-lbl">공동</div><div class="pay-val">'+W(t.joint)+'</div></div>'+
+    '<div class="pay-cell"><div class="pay-lbl">미정/기타</div><div class="pay-val">'+W(t.tbd)+'</div></div>'+
+    '</div></div>';
+  setH('tab-'+sid,h);
+}
+
+function renderSummary(){
+  var tB=0,tA=0,tGr=0,tBr=0,tJt=0,tTd=0;
+  var rows='',prog='';
+  SECTIONS.forEach(function(sec,i){
+    var t=calcSec(sec.id);
+    tB+=t.budget;tA+=t.actual;tGr+=t.groom;tBr+=t.bride;tJt+=t.joint;tTd+=t.tbd;
+    var diff=t.budget-t.actual;
+    rows+='<tr>'+
+      '<td style="color:var(--text-muted);font-size:11px;">'+(i+1)+'</td>'+
+      '<td style="font-weight:600">'+sec.icon+' '+sec.label+'</td>'+
+      '<td class="r">'+W(t.budget)+'</td><td class="r">'+W(t.actual)+'</td>'+
+      '<td class="r">'+WS(diff)+'</td>'+
+      '<td class="r">'+W(t.groom)+'</td><td class="r">'+W(t.bride)+'</td>'+
+      '<td class="r">'+W(t.joint)+'</td><td class="r">'+W(t.tbd)+'</td>'+
+      '</tr>';
+    var pct=t.budget>0?Math.min(t.actual/t.budget*100,150):t.actual>0?100:0;
+    var over=t.actual>t.budget&&t.budget>0;
+    prog+='<div class="prog-row">'+
+      '<div class="prog-meta">'+
+      '<span class="prog-name">'+sec.icon+' '+sec.label+'</span>'+
+      '<span class="prog-nums">'+W(t.actual)+' / '+(t.budget>0?W(t.budget):'예산 미설정')+'</span>'+
+      '</div>'+
+      '<div class="prog-bg"><div class="prog-fill'+(over?' over':'')+'" style="width:'+pct+'%"></div></div>'+
+      '</div>';
+  });
+  setT('totalBudget',W(tB));setT('totalActual',W(tA));
+  setT('groomTotal',W(tGr));setT('brideTotal',W(tBr));
+  setT('jointTotal',W(tJt));setT('tbdTotal',W(tTd));
+  var diff=tB-tA,badge=document.getElementById('totalDiffBadge');
+  if(badge){
+    if(tB===0){badge.className='badge badge-pend';badge.textContent='예산 미설정';}
+    else if(diff<0){badge.className='badge badge-over';badge.innerHTML='▲ 초과 '+W(-diff);}
+    else{badge.className='badge badge-ok';badge.innerHTML='▼ 여유 '+W(diff);}
+  }
+  setH('summaryBody',rows);setH('progressRows',prog);
+  setT('sumBudget',W(tB));setT('sumActual',W(tA));setH('sumDiff',WS(tB-tA));
+  setT('sumGroom',W(tGr));setT('sumBride',W(tBr));setT('sumJoint',W(tJt));setT('sumTbd',W(tTd));
+}
+
+function renderAll(){
+  SECTIONS.forEach(function(s){renderSec(s);});
+  renderSummary();renderGiftBanner();
+  setT('lastSaved','로컬에 저장된 데이터');
+}
+
+// ════════════════════════════════════
+// BUDGET INTERACTIONS
+// ════════════════════════════════════
+function uf(el){
+  var sid=el.dataset.s,idx=parseInt(el.dataset.i,10),field=el.dataset.f;
+  budgetData[sid][idx][field]=el.value;autoSave();
+}
+function un(el){
+  var sid=el.dataset.s,idx=parseInt(el.dataset.i,10),field=el.dataset.f;
+  var clean=el.value.replace(/[^0-9]/g,'');
+  budgetData[sid][idx][field]=clean?parseInt(clean,10):0;
+  autoSave();
+  renderSec(SECTIONS.find(function(s){return s.id===sid;}));
+  renderSummary();
+}
+function addRow(sid){
+  budgetData[sid].push({name:'새 항목',detail:'',budget:0,actual:0,payer:'미정',note:''});
+  renderSec(SECTIONS.find(function(s){return s.id===sid;}));
+  renderSummary();autoSave();
+}
+
+// ════════════════════════════════════
+// GIFT MODULE
+// ════════════════════════════════════
+function calcGift(){
+  var total=0,gr=0,br=0,jt=0,my=0,mn=0;
+  giftData.forEach(function(g){
+    total+=g.amount;
+    if(g.side==='신랑측')gr+=g.amount;
+    else if(g.side==='신부측')br+=g.amount;
+    else jt+=g.amount;
+    if(g.meal==='식사O')my++;else mn++;
+  });
+  return{total:total,groom:gr,bride:br,joint:jt,count:giftData.length,
+    mealY:my,avg:giftData.length?Math.round(total/giftData.length):0};
+}
+function renderGiftBanner(){
+  var s=calcGift(),b=document.getElementById('giftBanner');
+  if(!b)return;
+  if(s.count>0){
+    b.style.display='block';
+    setT('dashGiftTotal',W(s.total));
+    setT('dashGiftCount',s.count+'명');
+    var tA=0;
+    try{Object.values(budgetData).forEach(function(arr){arr.forEach(function(x){tA+=(x.actual||0);});});}catch(e){}
+    var net=s.total-tA,el=document.getElementById('dashGiftNet');
+    if(el){el.textContent=(net>=0?'+':'')+W(net);el.style.color=net>=0?'#4ade80':'#f87171';}
+  }else{b.style.display='none';}
+}
+
+function addGiftEntry(){
+  var name=document.getElementById('gf_name').value.trim();
+  var raw=document.getElementById('gf_amount').value.replace(/[^0-9]/g,'');
+  var amount=parseInt(raw,10)||0;
+  if(!name){alert('이름을 입력해주세요.');document.getElementById('gf_name').focus();return;}
+  if(!amount){alert('금액을 입력해주세요.');document.getElementById('gf_amount').focus();return;}
+  giftData.unshift({id:gid(),name:name,amount:amount,
+    relation:document.getElementById('gf_relation').value,
+    side:document.getElementById('gf_side').value,
+    meal:document.getElementById('gf_meal').value,
+    memo:document.getElementById('gf_memo').value.trim(),
+    date:document.getElementById('gf_date').value||new Date().toISOString().slice(0,10)
+  });
+  saveGift();
+  document.getElementById('gf_name').value='';
+  document.getElementById('gf_amount').value='';
+  document.getElementById('gf_memo').value='';
+  document.getElementById('gf_name').focus();
+}
+function delGift(id){
+  if(!confirm('삭제하겠습니까?'))return;
+  giftData=giftData.filter(function(g){return g.id!==id;});
+  saveGift();
+}
+function ugf(idx,field,val){
+  if(!giftData[idx])return;
+  giftData[idx][field]=field==='amount'?parseInt(String(val).replace(/[^0-9]/g,''),10)||0:val;
+  saveGift();
+}
+function filtGift(){
+  return giftData.filter(function(g){
+    var q=giftFilter.search.toLowerCase();
+    return(!q||g.name.toLowerCase().indexOf(q)>=0||String(g.memo||'').toLowerCase().indexOf(q)>=0)&&
+      (!giftFilter.side||g.side===giftFilter.side)&&
+      (!giftFilter.relation||g.relation===giftFilter.relation);
+  });
+}
+function renderGiftTab(){
+  var RELS=['친구','직장동료','친척','선후배','지인','기타'];
+  var SIDES=['신랑측','신부측','공통','기타'];
+  var MEALS=['식사O','식사X'];
+  var s=calcGift(),list=filtGift();
+  var today=new Date().toISOString().slice(0,10);
+
+  var rows='';
+  if(list.length===0){
+    rows='<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--text-muted);">아직 축의금 내역이 없습니다.</td></tr>';
+  }else{
+    list.forEach(function(g){
+      var gi=giftData.indexOf(g);
+      var so=SIDES.map(function(x){return '<option value="'+x+'"'+(g.side===x?' selected':'')+'>'+x+'</option>';}).join('');
+      var ro=RELS.map(function(x){return '<option value="'+x+'"'+(g.relation===x?' selected':'')+'>'+x+'</option>';}).join('');
+      var mo=MEALS.map(function(x){return '<option value="'+x+'"'+(g.meal===x?' selected':'')+'>'+x+'</option>';}).join('');
+      rows+='<tr>'+
+        '<td style="color:var(--text-muted);font-size:11px;">'+(gi+1)+'</td>'+
+        '<td><input class="gi-input" style="font-weight:600;" value="'+eH(g.name)+'" data-gi="'+gi+'" data-gf="name" onchange="ugf(parseInt(this.dataset.gi),this.dataset.gf,this.value)"></td>'+
+        '<td class="r"><input class="gi-input num" value="'+g.amount.toLocaleString('ko-KR')+'" data-gi="'+gi+'" data-gf="amount" onchange="ugf(parseInt(this.dataset.gi),this.dataset.gf,this.value)"></td>'+
+        '<td><select class="gi-sel" data-gi="'+gi+'" data-gf="side" onchange="ugf(parseInt(this.dataset.gi),this.dataset.gf,this.value)">'+so+'</select></td>'+
+        '<td><select class="gi-sel" data-gi="'+gi+'" data-gf="relation" onchange="ugf(parseInt(this.dataset.gi),this.dataset.gf,this.value)">'+ro+'</select></td>'+
+        '<td><select class="gi-sel" data-gi="'+gi+'" data-gf="meal" onchange="ugf(parseInt(this.dataset.gi),this.dataset.gf,this.value)">'+mo+'</select></td>'+
+        '<td><input class="gi-input" value="'+eH(g.memo||'')+'" placeholder="메모" data-gi="'+gi+'" data-gf="memo" onchange="ugf(parseInt(this.dataset.gi),this.dataset.gf,this.value)"></td>'+
+        '<td style="font-size:11px;color:var(--text-muted);">'+eH(g.date||'')+'</td>'+
+        '<td><button class="del-btn" data-gid="'+eH(g.id)+'" onclick="delGift(this.dataset.gid)">삭제</button></td>'+
+        '</tr>';
+    });
+  }
+  var ft=list.reduce(function(s,g){return s+g.amount;},0);
+  var sOpts='<option value="">전체 측</option>'+SIDES.map(function(x){return '<option value="'+x+'"'+(giftFilter.side===x?' selected':'')+'>'+x+'</option>';}).join('');
+  var rOpts='<option value="">전체 관계</option>'+RELS.map(function(x){return '<option value="'+x+'"'+(giftFilter.relation===x?' selected':'')+'>'+x+'</option>';}).join('');
+
+  var h=
+  // 입력 폼
+  '<div class="card">'+
+  '<div class="card-hdr"><div class="card-title">✏️ 축의금 직접 입력</div></div>'+
+  '<div class="card-body">'+
+  '<div class="gift-form-grid">'+
+  '<div class="gf" style="grid-column:span 2"><label>이름 *</label><input id="gf_name" type="text" placeholder="홍길동" onkeydown="if(event.key===&apos;Enter&apos;)document.getElementById(&apos;gf_amount&apos;).focus()"></div>'+
+  '<div class="gf"><label>금액(원) *</label><input id="gf_amount" type="text" inputmode="numeric" placeholder="100000" oninput="this.value=this.value.replace(/[^0-9]/g,&apos;&apos;)" onkeydown="if(event.key===&apos;Enter&apos;)addGiftEntry()"></div>'+
+  '<div class="gf"><label>신랑/신부측</label><select id="gf_side"><option>신랑측</option><option>신부측</option><option>공통</option><option>기타</option></select></div>'+
+  '<div class="gf"><label>관계</label><select id="gf_relation"><option>친구</option><option>직장동료</option><option>친척</option><option>선후배</option><option>지인</option><option>기타</option></select></div>'+
+  '<div class="gf"><label>식사 여부</label><select id="gf_meal"><option>식사O</option><option>식사X</option></select></div>'+
+  '<div class="gf"><label>날짜</label><input id="gf_date" type="date" value="'+today+'"></div>'+
+  '<div class="gf" style="grid-column:span 2"><label>메모</label><input id="gf_memo" type="text" placeholder="선물, 특이사항 등"></div>'+
+  '</div>'+
+  '<button class="btn-pri" onclick="addGiftEntry()" style="font-size:14px;padding:12px 30px;">＋ 축의금 추가</button>'+
+  '</div></div>'+
+
+  // Excel 가져오기
+  '<div class="card">'+
+  '<div class="card-hdr">'+
+  '<div class="card-title">📊 엑셀 일괄 가져오기</div>'+
+  '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+
+  '<button class="tmpl-btn" onclick="dlGiftTmpl()">⬇️ 양식 다운로드</button>'+
+  '<button class="tmpl-btn" onclick="document.getElementById(&apos;gXlsxIn&apos;).click()">📤 파일 업로드</button>'+
+  '<input type="file" id="gXlsxIn" accept=".xlsx,.xls,.csv" style="display:none" onchange="importGiftFile(event)">'+
+  '</div></div>'+
+  '<div class="card-body">'+
+  '<div class="drop-zone" id="gDropZone" onclick="document.getElementById(&apos;gXlsxIn&apos;).click()" ondragover="event.preventDefault();this.classList.add(&apos;dv&apos;)" ondragleave="this.classList.remove(&apos;dv&apos;)" ondrop="handleGiftDrop(event)">'+
+  '<div style="font-size:32px;margin-bottom:8px;">📁</div>'+
+  '<div style="font-size:13px;font-weight:600;color:var(--text-secondary);">엑셀 파일을 끌어다 놓거나 클릭하세요</div>'+
+  '<div style="font-size:11px;color:var(--text-muted);margin-top:3px;">.xlsx / .xls / .csv 지원</div>'+
+  '</div>'+
+  '<table class="fmt-tbl"><thead><tr><th>A:이름</th><th>B:금액</th><th>C:신랑/신부측</th><th>D:관계</th><th>E:식사여부</th><th>F:날짜</th><th>G:메모</th></tr></thead>'+
+  '<tbody><tr><td>홍길동</td><td>100000</td><td>신랑측</td><td>친구</td><td>식사O</td><td>2025-06-15</td><td></td></tr></tbody></table>'+
+  '<div id="importMsg" style="display:none;margin-top:10px;font-size:12px;font-weight:600;"></div>'+
+  '</div></div>'+
+
+  // 통계
+  '<div class="gift-stats">'+
+  '<div class="gstat"><div class="gstat-lbl">총 축의금</div><div class="gstat-val gold">'+W(s.total)+'</div></div>'+
+  '<div class="gstat"><div class="gstat-lbl">하객 수</div><div class="gstat-val">'+s.count+'명</div></div>'+
+  '<div class="gstat"><div class="gstat-lbl">평균 금액</div><div class="gstat-val">'+W(s.avg)+'</div></div>'+
+  '<div class="gstat"><div class="gstat-lbl">신랑측</div><div class="gstat-val blue">'+W(s.groom)+'</div></div>'+
+  '<div class="gstat"><div class="gstat-lbl">신부측</div><div class="gstat-val pink">'+W(s.bride)+'</div></div>'+
+  '<div class="gstat"><div class="gstat-lbl">식사 참석</div><div class="gstat-val grn">'+s.mealY+'명</div></div>'+
+  '</div>'+
+
+  // 목록
+  '<div class="card">'+
+  '<div class="card-hdr">'+
+  '<div class="card-title">📋 축의금 전체 내역</div>'+
+  '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+
+  '<button class="xl-btn" onclick="exportGiftXlsx()">📥 엑셀 다운로드</button>'+
+  '<button class="tmpl-btn" onclick="exportGiftCsv()">CSV 다운로드</button>'+
+  '</div></div>'+
+  '<div style="padding:14px 14px 4px;">'+
+  '<div class="filter-bar">'+
+  '<input class="fsearch" type="text" placeholder="🔍 이름, 메모 검색..." value="'+eH(giftFilter.search)+'" oninput="giftFilter.search=this.value;renderGiftTab()">'+
+  '<select class="fsel" onchange="giftFilter.side=this.value;renderGiftTab()">'+sOpts+'</select>'+
+  '<select class="fsel" onchange="giftFilter.relation=this.value;renderGiftTab()">'+rOpts+'</select>'+
+  '<span style="font-size:11px;color:var(--text-muted);">'+list.length+'명 / '+W(ft)+'</span>'+
+  '</div></div>'+
+  '<div class="tbl-wrap"><table>'+
+  '<thead><tr><th>#</th><th>이름</th><th class="r">금액</th><th>측</th><th>관계</th><th>식사</th><th>메모</th><th>날짜</th><th></th></tr></thead>'+
+  '<tbody>'+rows+'</tbody>'+
+  '<tfoot><tr><td colspan="2">✦ 합 계</td><td class="r" style="color:var(--gold-dark)">'+W(ft)+'</td><td colspan="6" style="font-size:11px;color:var(--text-muted);font-weight:400;">'+list.length+'명 / 전체 '+giftData.length+'명</td></tr></tfoot>'+
+  '</table></div></div>';
+
+  setH('tab-gift',h);
+}
+
+// ════════════════════════════════════
+// GIFT EXCEL IMPORT/EXPORT (CSV-based, no SheetJS dependency)
+// ════════════════════════════════════
+function handleGiftDrop(e){
+  e.preventDefault();
+  var dz=document.getElementById('gDropZone');if(dz)dz.classList.remove('dv');
+  var f=e.dataTransfer.files[0];if(f)processGiftFile(f);
+}
+function importGiftFile(e){var f=e.target.files[0];if(f)processGiftFile(f);e.target.value='';}
+function processGiftFile(f){
+  var r=new FileReader();
+  r.onload=function(ev){
+    var text=ev.target.result;
+    // Try to detect if it's xlsx binary - if so, show message
+    if(f.name.toLowerCase().endsWith('.csv')||text.indexOf(',')>=0){
+      parseGiftCSV(text);
+    }else{
+      showImportMsg('CSV 파일을 사용해주세요. 엑셀 파일은 먼저 CSV로 저장해서 업로드하세요.',false);
+    }
+  };
+  r.readAsText(f,'UTF-8');
+}
+function parseGiftCSV(text){
+  var lines=text.split(String.fromCharCode(10)).map(function(l){return l.replace(/\r$/,'');}).filter(function(l){return l.trim().length>0;});
+  var rows=lines.map(function(l){return l.split(',').map(function(c){return c.replace(/^"|"$/g,'').trim();});});
+  parseGiftRows(rows);
+}
+function parseGiftRows(rows){
+  if(!rows||rows.length<2){showImportMsg('데이터가 없습니다. 헤더 포함 2행 이상 필요합니다.',false);return;}
+  var SIDES=['신랑측','신부측','공통','기타'];
+  var RELS=['친구','직장동료','친척','선후배','지인','기타'];
+  var added=0,skipped=0;
+  var first=(rows[0]||[]).map(function(c){return String(c).toLowerCase();});
+  var hasH=first.some(function(c){return c.indexOf('이름')>=0||c.indexOf('name')>=0||c.indexOf('금액')>=0;});
+  var start=hasH?1:0;
+  for(var i=start;i<rows.length;i++){
+    var row=rows[i];
+    var name=String(row[0]||'').trim();
+    var raw=String(row[1]||'').replace(/[^0-9]/g,'');
+    var amount=parseInt(raw,10);
+    if(!name||!amount){skipped++;continue;}
+    var sRaw=String(row[2]||'').trim();
+    var side=SIDES.find(function(s){return sRaw.indexOf(s)>=0;})||(sRaw.indexOf('신랑')>=0?'신랑측':sRaw.indexOf('신부')>=0?'신부측':'공통');
+    var rRaw=String(row[3]||'').trim();
+    var rel=RELS.find(function(r){return rRaw.indexOf(r)>=0;})||(rRaw||'기타');
+    var mRaw=String(row[4]||'').trim();
+    var meal=(mRaw.toUpperCase().indexOf('X')>=0||mRaw==='0')?'식사X':'식사O';
+    var date=String(row[5]||'').trim()||new Date().toISOString().slice(0,10);
+    var memo=String(row[6]||'').trim();
+    giftData.push({id:gid(),name:name,amount:amount,side:side,relation:rel,meal:meal,date:date,memo:memo});
+    added++;
+  }
+  saveGift();
+  showImportMsg('✓ '+added+'명 추가 완료'+(skipped>0?' ('+skipped+'행 건너뜀)':''),added>0);
+}
+function showImportMsg(msg,ok){
+  var el=document.getElementById('importMsg');
+  if(el){el.style.display='block';el.style.color=ok?'var(--success)':'var(--danger)';el.textContent=msg;}
+}
+function exportGiftCsv(){
+  var hdr=['이름','금액','신랑신부측','관계','식사여부','날짜','메모'];
+  var rows=giftData.map(function(g){return[g.name,g.amount,g.side,g.relation,g.meal,g.date,g.memo||''];});
+  var csv=[hdr].concat(rows).map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join(String.fromCharCode(10));
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
+  a.download='축의금_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+function exportGiftXlsx(){exportGiftCsv();} // CSV fallback (no SheetJS)
+function dlGiftTmpl(){
+  var NL=String.fromCharCode(10);
+  var hdr=['\uc774\ub984','\uae08\uc561','\uc2e0\ub791/\uc2e0\ubd80\uce21','\uad00\uacc4','\uc2dd\uc0ac\uc5ec\ubd80','\ub0a0\uc9dc','\uba54\ubaa8'];
+  var r1=['\ud64d\uae38\ub3d9','100000','\uc2e0\ub791\uce21','\uce5c\uad6c','\uc2dd\uc0acO','2025-06-15',''];
+  var r2=['\uae40\uc601\ud76c','50000','\uc2e0\ubd80\uce21','\uc9c1\uc7a5\ub3d9\ub8cc','\uc2dd\uc0acX','2025-06-15',''];
+  var csv='\uFEFF'+[hdr,r1,r2].map(function(r){return r.map(function(c){return '"'+c+'"';}).join(',');}).join(NL);
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='\ucd95\uc758\uae08_\uc785\ub825\uc591\uc2dd.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+// ════════════════════════════════════
+// JEONSE CALCULATOR
+// ════════════════════════════════════
+var LOANS=[
+  {id:'hubo',name:'청년버팀목',icon:'🏛️',rate:2.1,maxL:200000000,maxR:80,desc:'연 1.5~2.7% / 최대 2억'},
+  {id:'jeonse',name:'전세자금대출',icon:'🏦',rate:3.8,maxL:300000000,maxR:80,desc:'연 3.5~4.5% / 최대 3억'},
+  {id:'didi',name:'디딤돌대출',icon:'🏠',rate:2.65,maxL:250000000,maxR:70,desc:'연 2.35~3.0% / 최대 2.5억'},
+  {id:'hug',name:'HUG보증',icon:'🛡️',rate:4.1,maxL:400000000,maxR:90,desc:'연 3.8~4.5% / 최대 4억'},
+  {id:'kakao',name:'카카오뱅크',icon:'💛',rate:4.3,maxL:300000000,maxR:80,desc:'연 4.0~4.8% / 최대 3억'},
+  {id:'custom',name:'직접입력',icon:'✏️',rate:3.5,maxL:999999999,maxR:80,desc:'금리·한도 직접 설정'}
+];
+var JS={loanType:'jeonse',jeonseAmt:0,selfFund:0,loanAmt:0,term:2,repay:'bullet',cRate:3.5,cMaxR:80};
+
+function initJeonse(){var s=localStorage.getItem('wb_jeonse_v1');if(s){try{JS=Object.assign(JS,JSON.parse(s));}catch(e){}}}
+function saveJeonse(){localStorage.setItem('wb_jeonse_v1',JSON.stringify(JS));}
+function getLoan(){return LOANS.find(function(l){return l.id===JS.loanType;})||LOANS[1];}
+function selLoan(id){JS.loanType=id;saveJeonse();renderJeonseTab();}
+
+function doCalc(){
+  var j=parseInt(String(document.getElementById('jf_j').value||'0').replace(/[^0-9]/g,''),10)||0;
+  var sf=parseInt(String(document.getElementById('jf_s').value||'0').replace(/[^0-9]/g,''),10)||0;
+  var lr=parseInt(String(document.getElementById('jf_l').value||'0').replace(/[^0-9]/g,''),10)||0;
+  var lt=getLoan();
+  var rate=JS.loanType==='custom'?(parseFloat(document.getElementById('jf_cr').value)||3.5):lt.rate;
+  var maxR=JS.loanType==='custom'?(parseFloat(document.getElementById('jf_mr').value)||80):lt.maxR;
+  var maxL=JS.loanType==='custom'?999999999:lt.maxL;
+  var term=parseInt(document.getElementById('jf_t').value,10)||2;
+  var repay=document.getElementById('jf_r').value||'bullet';
+  JS.jeonseAmt=j;JS.selfFund=sf;JS.loanAmt=lr;JS.term=term;JS.repay=repay;saveJeonse();
+  if(!j){alert('전세 보증금을 입력해주세요.');return;}
+
+  var capR=Math.floor(j*maxR/100);
+  var cap=Math.min(capR,maxL);
+  var actual=Math.min(lr,cap);
+  var short=j-sf-actual;
+  var mr2=rate/100/12,months=term*12,mp=0,ti=0;
+  if(repay==='bullet'){mp=Math.round(actual*mr2);ti=mp*months;}
+  else if(repay==='equal'){
+    if(mr2>0)mp=Math.round(actual*mr2*Math.pow(1+mr2,months)/(Math.pow(1+mr2,months)-1));
+    else mp=Math.round(actual/months);
+    ti=mp*months-actual;
+  }else{
+    var pp=Math.round(actual/months);mp=pp+Math.round(actual*mr2);
+    ti=Math.round(actual*mr2*(months+1)/2);
+  }
+  var rLabel=repay==='bullet'?'만기일시':repay==='equal'?'원리금균등':'원금균등';
+  var shortOk=short<=0;
+  var shortCard=shortOk?
+    '<div class="jrc good"><div class="jrc-lbl">자금 여유</div><div class="jrc-val">'+fmtMan(Math.abs(short))+'</div><div class="jrc-sub">자기자금+대출 > 전세금</div></div>':
+    '<div class="jrc warn"><div class="jrc-lbl">⚠️ 부족 자금</div><div class="jrc-val">'+fmtMan(short)+'</div><div class="jrc-sub">추가 마련 필요</div></div>';
+
+  var rH=
+  '<div class="jres-grid">'+
+  '<div class="jrc acc"><div class="jrc-lbl">전세 보증금</div><div class="jrc-val">'+fmtMan(j)+'</div><div class="jrc-sub">목표 금액</div></div>'+
+  '<div class="jrc"><div class="jrc-lbl">자기 자금</div><div class="jrc-val">'+fmtMan(sf)+'</div><div class="jrc-sub">'+(j>0?Math.round(sf/j*100):0)+'% 비율</div></div>'+
+  '<div class="jrc"><div class="jrc-lbl">실행 대출금</div><div class="jrc-val">'+fmtMan(actual)+'</div><div class="jrc-sub">한도 '+fmtMan(cap)+' 이내</div></div>'+
+  shortCard+
+  '<div class="jrc"><div class="jrc-lbl">월 납입액</div><div class="jrc-val">'+fmtMan(mp)+'</div><div class="jrc-sub">'+rLabel+' ('+rate+'%)</div></div>'+
+  '<div class="jrc"><div class="jrc-lbl">총 이자 부담</div><div class="jrc-val" style="color:var(--danger)">'+fmtMan(ti)+'</div><div class="jrc-sub">'+term+'년 계약 기준</div></div>'+
+  '</div>'+
+  '<div class="card">'+
+  '<div class="card-hdr"><div class="card-title">📊 자금 구성 상세</div></div>'+
+  '<div class="tbl-wrap"><table>'+
+  '<thead><tr><th>항목</th><th class="r">금액</th><th class="r">비율</th><th>비고</th></tr></thead>'+
+  '<tbody>'+
+  '<tr><td>전세 보증금</td><td class="r">'+fmtMan(j)+'</td><td class="r">100%</td><td>목표</td></tr>'+
+  '<tr><td style="padding-left:20px;color:var(--text-secondary)">└ 자기 자금</td><td class="r" style="color:var(--success)">'+fmtMan(sf)+'</td><td class="r">'+(j>0?Math.round(sf/j*100):0)+'%</td><td>현금·예금</td></tr>'+
+  '<tr><td style="padding-left:20px;color:var(--text-secondary)">└ 실행 대출</td><td class="r" style="color:var(--gold-dark)">'+fmtMan(actual)+'</td><td class="r">'+(j>0?Math.round(actual/j*100):0)+'%</td><td>LTV '+maxR+'% 한도</td></tr>'+
+  '<tr><td>'+(short>0?'⚠️ 부족':'✅ 여유')+'</td><td class="r" style="color:'+(short>0?'var(--danger)':'var(--success)')+'">'+fmtMan(Math.abs(short))+'</td><td class="r">-</td><td>'+(short>0?'추가 마련 필요':'여유 자금')+'</td></tr>'+
+  '</tbody>'+
+  '<tfoot><tr><td>총 상환액</td><td class="r">'+fmtMan(actual+ti)+'</td><td class="r">-</td><td>'+term+'년 / '+rate+'% / '+rLabel+'</td></tr></tfoot>'+
+  '</table></div></div>'+
+  '<div class="j-notice">💡 <strong>참고</strong>: 실제 대출 한도·금리는 소득·신용점수·부동산 유형·은행 정책에 따라 달라집니다. 청년버팀목·디딤돌은 소득·자산 기준 충족 필요. 본 계산기는 참고용입니다.</div>';
+
+  var rs=document.getElementById('jResult');
+  if(rs){rs.innerHTML=rH;rs.classList.add('show');}
+
+  // s7 연동
+  if(budgetData['s7']&&budgetData['s7'][0]){
+    budgetData['s7'][0].budget=j;
+    if(actual>0)budgetData['s7'][0].actual=actual;
+    autoSave();
+  }
+}
+
+function renderJeonseTab(){
+  initJeonse();
+  var lt=getLoan();
+  var isC=JS.loanType==='custom';
+
+  var pills=LOANS.map(function(l){
+    return '<div class="lp'+(JS.loanType===l.id?' sel':'')+'" onclick="selLoan(&apos;'+l.id+'&apos;)">'+
+      '<div class="lp-icon">'+l.icon+'</div>'+
+      '<div class="lp-name">'+l.name+'</div>'+
+      '<div class="lp-rate">'+(l.id==='custom'?'직접입력':'연 '+l.rate+'%')+'</div>'+
+      '</div>';
+  }).join('');
+
+  var customFields=isC?
+    '<div class="jf"><label>적용 금리(%)</label><div class="inp-wrap"><input id="jf_cr" class="ji" style="padding-left:12px;" type="number" step="0.1" min="0.1" max="20" value="'+(JS.cRate||3.5)+'"><span class="sfx">%</span></div></div>'+
+    '<div class="jf"><label>LTV 한도(%)</label><div class="inp-wrap"><input id="jf_mr" class="ji" style="padding-left:12px;" type="number" step="1" min="1" max="100" value="'+(JS.cMaxR||80)+'"><span class="sfx">%</span></div></div>':
+    '<div class="jf"><label>적용 금리</label><div class="jrate-display">'+lt.rate+'% <span style="font-size:11px;font-family:var(--font-ui);color:var(--text-muted);font-weight:400;">('+lt.desc+')</span></div></div>';
+
+  var h=
+  '<div class="jeonse-hero">'+
+  '<div><div class="jh-title">🏡 전세자금 계산기</div>'+
+  '<div class="jh-sub">전세 보증금 · 자기자금 · 대출 한도를 입력하면<br>월 납입액, 이자 총액, 부족 자금을 자동 계산합니다.</div></div>'+
+  '<div style="font-size:44px;opacity:.8;">🔑</div>'+
+  '</div>'+
+
+  '<div class="card">'+
+  '<div class="card-hdr"><div class="card-title">🏦 대출 상품 선택</div></div>'+
+  '<div class="card-body"><div class="loan-pills">'+pills+'</div></div>'+
+  '</div>'+
+
+  '<div class="card">'+
+  '<div class="card-hdr"><div class="card-title">📝 자금 정보 입력</div></div>'+
+  '<div class="card-body">'+
+  '<div class="ji-grid">'+
+  '<div class="jf"><label>전세 보증금 (예상)</label>'+
+  '<div class="inp-wrap"><span class="pfx">₩</span>'+
+  '<input id="jf_j" class="ji" type="text" inputmode="numeric" placeholder="300,000,000" value="'+(JS.jeonseAmt>0?JS.jeonseAmt.toLocaleString('ko-KR'):'')+'">'+
+  '<span class="sfx">원</span></div><div class="hint">예) 3억 → 300000000</div></div>'+
+
+  '<div class="jf"><label>자기 자금 (보유)</label>'+
+  '<div class="inp-wrap"><span class="pfx">₩</span>'+
+  '<input id="jf_s" class="ji" type="text" inputmode="numeric" placeholder="100,000,000" value="'+(JS.selfFund>0?JS.selfFund.toLocaleString('ko-KR'):'')+'">'+
+  '<span class="sfx">원</span></div><div class="hint">현금+예금+지원금 등</div></div>'+
+
+  '<div class="jf"><label>대출 신청 금액</label>'+
+  '<div class="inp-wrap"><span class="pfx">₩</span>'+
+  '<input id="jf_l" class="ji" type="text" inputmode="numeric" placeholder="200,000,000" value="'+(JS.loanAmt>0?JS.loanAmt.toLocaleString('ko-KR'):'')+'">'+
+  '<span class="sfx">원</span></div><div class="hint">LTV '+(isC?JS.cMaxR:lt.maxR)+'% 이내 자동 적용</div></div>'+
+
+  customFields+
+
+  '<div class="jf"><label>대출 기간</label>'+
+  '<select id="jf_t" class="jsel">'+
+  [1,2,3,5,10].map(function(y){return '<option value="'+y+'"'+(JS.term===y?' selected':'')+'>'+y+'년</option>';}).join('')+
+  '</select></div>'+
+
+  '<div class="jf"><label>상환 방식</label>'+
+  '<select id="jf_r" class="jsel">'+
+  '<option value="bullet"'+(JS.repay==='bullet'?' selected':'')+'>만기일시상환 (전세 일반)</option>'+
+  '<option value="equal"'+(JS.repay==='equal'?' selected':'')+'>원리금균등상환</option>'+
+  '<option value="principal"'+(JS.repay==='principal'?' selected':'')+'>원금균등상환</option>'+
+  '</select></div>'+
+  '</div>'+
+  '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'+
+  '<button class="btn-calc" onclick="doCalc()">🧮 계산하기</button>'+
+  '<button class="btn-rst" onclick="resetJeonse()">초기화</button>'+
+  '</div>'+
+  '</div></div>'+
+
+  '<div id="jResult" class="j-result"></div>';
+
+  setH('tab-jeonse',h);
+}
+
+function resetJeonse(){
+  JS={loanType:'jeonse',jeonseAmt:0,selfFund:0,loanAmt:0,term:2,repay:'bullet',cRate:3.5,cMaxR:80};
+  saveJeonse();renderJeonseTab();
+}
+
+// ════════════════════════════════════
+// BOOT
+// ════════════════════════════════════
+initData();
+initGift();
+initJeonse();
+renderAll();
+</script>
+</body>
+</html>
