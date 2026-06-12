@@ -1015,9 +1015,29 @@ var JS={loanType:'jeonse',jeonseAmt:0,selfFund:0,loanAmt:0,term:2,repay:'bullet'
 function initJeonse(){var s=localStorage.getItem('wb_jeonse_v1');if(s){try{JS=Object.assign(JS,JSON.parse(s));}catch(e){}}}
 function saveJeonse(){localStorage.setItem('wb_jeonse_v1',JSON.stringify(JS));}
 function getLoan(){return LOANS.find(function(l){return l.id===JS.loanType;})||LOANS[1];}
-function selLoan(id){JS.loanType=id;saveJeonse();renderJeonseTab();}
+function selLoan(id){syncJF();JS.loanType=id;saveJeonse();renderJeonseTab();if(JS.calced&&JS.jeonseAmt>0)doCalc(true);}
+// 입력값을 즉시 상태에 반영 (재렌더링되어도 값 유지)
+function syncJF(){
+  var g=function(id){var e=document.getElementById(id);return e?(parseInt(String(e.value).replace(/[^0-9]/g,''),10)||0):null;};
+  var j=g('jf_j');if(j!==null)JS.jeonseAmt=j;
+  var s=g('jf_s');if(s!==null)JS.selfFund=s;
+  var l=g('jf_l');if(l!==null)JS.loanAmt=l;
+  var t=document.getElementById('jf_t');if(t)JS.term=parseInt(t.value,10)||2;
+  var r=document.getElementById('jf_r');if(r)JS.repay=r.value;
+  var cr=document.getElementById('jf_cr');if(cr)JS.cRate=parseFloat(cr.value)||3.5;
+  var mr=document.getElementById('jf_mr');if(mr)JS.cMaxR=parseFloat(mr.value)||80;
+  saveJeonse();
+}
+// 금액 입력 시: 쉼표 자동 표시 + 상태 저장 + 결과 자동 갱신
+function jfInput(el){
+  var raw=el.value.replace(/[^0-9]/g,'');
+  el.value=raw?parseInt(raw,10).toLocaleString('ko-KR'):'';
+  syncJF();
+  if(JS.calced)doCalc(true);
+}
+function jfChange(){syncJF();if(JS.calced)doCalc(true);}
 
-function doCalc(){
+function doCalc(silent){
   var j=parseInt(String(document.getElementById('jf_j').value||'0').replace(/[^0-9]/g,''),10)||0;
   var sf=parseInt(String(document.getElementById('jf_s').value||'0').replace(/[^0-9]/g,''),10)||0;
   var lr=parseInt(String(document.getElementById('jf_l').value||'0').replace(/[^0-9]/g,''),10)||0;
@@ -1028,7 +1048,7 @@ function doCalc(){
   var term=parseInt(document.getElementById('jf_t').value,10)||2;
   var repay=document.getElementById('jf_r').value||'bullet';
   JS.jeonseAmt=j;JS.selfFund=sf;JS.loanAmt=lr;JS.term=term;JS.repay=repay;saveJeonse();
-  if(!j){alert('전세 보증금을 입력해주세요.');return;}
+  if(!j){if(!silent)alert('전세 보증금을 입력해주세요.');return;}
 
   var capR=Math.floor(j*maxR/100);
   var cap=Math.min(capR,maxL);
@@ -1075,6 +1095,7 @@ function doCalc(){
 
   var rs=document.getElementById('jResult');
   if(rs){rs.innerHTML=rH;rs.classList.add('show');}
+  JS.calced=true;saveJeonse();
 
   // s7 연동
   if(budgetData['s7']&&budgetData['s7'][0]){
@@ -1098,8 +1119,8 @@ function renderJeonseTab(){
   }).join('');
 
   var customFields=isC?
-    '<div class="jf"><label>적용 금리(%)</label><div class="inp-wrap"><input id="jf_cr" class="ji" style="padding-left:12px;" type="number" step="0.1" min="0.1" max="20" value="'+(JS.cRate||3.5)+'"><span class="sfx">%</span></div></div>'+
-    '<div class="jf"><label>LTV 한도(%)</label><div class="inp-wrap"><input id="jf_mr" class="ji" style="padding-left:12px;" type="number" step="1" min="1" max="100" value="'+(JS.cMaxR||80)+'"><span class="sfx">%</span></div></div>':
+    '<div class="jf"><label>적용 금리(%)</label><div class="inp-wrap"><input id="jf_cr" class="ji" style="padding-left:12px;" type="number" step="0.1" min="0.1" max="20" oninput="jfChange()" value="'+(JS.cRate||3.5)+'"><span class="sfx">%</span></div></div>'+
+    '<div class="jf"><label>LTV 한도(%)</label><div class="inp-wrap"><input id="jf_mr" class="ji" style="padding-left:12px;" type="number" step="1" min="1" max="100" oninput="jfChange()" value="'+(JS.cMaxR||80)+'"><span class="sfx">%</span></div></div>':
     '<div class="jf"><label>적용 금리</label><div class="jrate-display">'+lt.rate+'% <span style="font-size:11px;font-family:var(--font-ui);color:var(--text-muted);font-weight:400;">('+lt.desc+')</span></div></div>';
 
   var h=
@@ -1120,28 +1141,28 @@ function renderJeonseTab(){
   '<div class="ji-grid">'+
   '<div class="jf"><label>전세 보증금 (예상)</label>'+
   '<div class="inp-wrap"><span class="pfx">₩</span>'+
-  '<input id="jf_j" class="ji" type="text" inputmode="numeric" placeholder="300,000,000" value="'+(JS.jeonseAmt>0?JS.jeonseAmt.toLocaleString('ko-KR'):'')+'">'+
+  '<input id="jf_j" class="ji" type="text" inputmode="numeric" placeholder="300,000,000" oninput="jfInput(this)" value="'+(JS.jeonseAmt>0?JS.jeonseAmt.toLocaleString('ko-KR'):'')+'">'+
   '<span class="sfx">원</span></div><div class="hint">예) 3억 → 300000000</div></div>'+
 
   '<div class="jf"><label>자기 자금 (보유)</label>'+
   '<div class="inp-wrap"><span class="pfx">₩</span>'+
-  '<input id="jf_s" class="ji" type="text" inputmode="numeric" placeholder="100,000,000" value="'+(JS.selfFund>0?JS.selfFund.toLocaleString('ko-KR'):'')+'">'+
+  '<input id="jf_s" class="ji" type="text" inputmode="numeric" placeholder="100,000,000" oninput="jfInput(this)" value="'+(JS.selfFund>0?JS.selfFund.toLocaleString('ko-KR'):'')+'">'+
   '<span class="sfx">원</span></div><div class="hint">현금+예금+지원금 등</div></div>'+
 
   '<div class="jf"><label>대출 신청 금액</label>'+
   '<div class="inp-wrap"><span class="pfx">₩</span>'+
-  '<input id="jf_l" class="ji" type="text" inputmode="numeric" placeholder="200,000,000" value="'+(JS.loanAmt>0?JS.loanAmt.toLocaleString('ko-KR'):'')+'">'+
+  '<input id="jf_l" class="ji" type="text" inputmode="numeric" placeholder="200,000,000" oninput="jfInput(this)" value="'+(JS.loanAmt>0?JS.loanAmt.toLocaleString('ko-KR'):'')+'">'+
   '<span class="sfx">원</span></div><div class="hint">LTV '+(isC?JS.cMaxR:lt.maxR)+'% 이내 자동 적용</div></div>'+
 
   customFields+
 
   '<div class="jf"><label>대출 기간</label>'+
-  '<select id="jf_t" class="jsel">'+
+  '<select id="jf_t" class="jsel" onchange="jfChange()">'+
   [1,2,3,5,10].map(function(y){return '<option value="'+y+'"'+(JS.term===y?' selected':'')+'>'+y+'년</option>';}).join('')+
   '</select></div>'+
 
   '<div class="jf"><label>상환 방식</label>'+
-  '<select id="jf_r" class="jsel">'+
+  '<select id="jf_r" class="jsel" onchange="jfChange()">'+
   '<option value="bullet"'+(JS.repay==='bullet'?' selected':'')+'>만기일시상환 (전세 일반)</option>'+
   '<option value="equal"'+(JS.repay==='equal'?' selected':'')+'>원리금균등상환</option>'+
   '<option value="principal"'+(JS.repay==='principal'?' selected':'')+'>원금균등상환</option>'+
